@@ -6,6 +6,6 @@ installation
 ==========
 
 ```
-% git submodules init --update --recursive
+% git submodules update --init --recursive
 % npm install
 ```

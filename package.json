@@ -16,6 +16,10 @@
   "author": "superisaac",
   "license": "MIT",
   "dependencies": {
-    "express": "~4.3.1"
+    "express": "~4.3.1",
+    "mongo": "~0.1.0",
+    "buffertools": "~2.1.2",
+    "mongodb": "~1.4.5",
+    "bignum": "~0.7.0"
   }
 }
