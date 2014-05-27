@@ -1,0 +1,21 @@
+{
+  "name": "explorer",
+  "version": "0.0.1",
+  "description": "Block chain explorer of bitcoin and altcoins",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bitcoin",
+    "altcoin",
+    "dogecoin",
+    "litecoin",
+    "nodejs"
+  ],
+  "author": "superisaac",
+  "license": "MIT",
+  "dependencies": {
+    "express": "~4.3.1"
+  }
+}

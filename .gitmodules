@@ -1,0 +1,3 @@
+[submodule "alliances/bitcore"]
+	path = alliances/bitcore
+	url = git@github.com:haobtc/bitcore.git
