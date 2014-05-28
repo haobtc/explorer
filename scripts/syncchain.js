@@ -1,7 +1,7 @@
-var bitcore = require('./alliances/bitcore/bitcore');
-var ChainSync = require('./controllers/ChainSync');
-var MongoStore = require('./lib/MongoStore');
-var helper = require('./lib/helper');
+var bitcore = require('../alliances/bitcore/bitcore');
+var ChainSync = require('../controllers/ChainSync');
+var MongoStore = require('../lib/MongoStore');
+var helper = require('../lib/helper');
 
 
 MongoStore.initialize(['dogecoin'], function(err, netname) {
