@@ -20,6 +20,9 @@
     "mongo": "~0.1.0",
     "buffertools": "~2.1.2",
     "mongodb": "~1.4.5",
-    "bignum": "~0.7.0"
+    "bignum": "~0.7.0",
+    "optimist": "~0.6.1",
+    "express-json": "~1.0.0",
+    "body-parser": "~1.2.2"
   }
 }

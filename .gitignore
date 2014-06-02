@@ -13,3 +13,4 @@ tags
 coverage
 .DS_Store
 docs
+config.json

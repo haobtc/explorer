@@ -1,0 +1,47 @@
+<html lang="en" ng-app="myApp">
+  <head>
+    <link rel="stylesheet" href="css/bootstrap.css" type="text/css"></link>
+    <link rel="stylesheet" href="css/flat-ui.css" type="text/css"></link>
+    <link rel="stylesheet" href="css/font-awesome.css" type="text/css"></link>
+    <script type="text/javascript" src="js/angular.js"></script>
+    <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="js/angular-route.js"></script>
+    <script type="text/javascript" src="js/explorer.app.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <title>explorer</title>
+  </head>
+  <body>
+    <div id="header" style="margin-bottom: 58px;">
+      <div class="navbar navbar-inverse navbar-fixed-top" role="banner">
+	<div class="navbar-header">
+	  <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-collapse">
+	    <span class="sr-only"></span>
+	    <span class="icon-bar"></span>
+	    <span class="icon-bar"></span>
+	    <span class="icon-bar"></span>
+	  </button>
+	  <em><a href="#/" class="navbar-brand">Openblock <span class="text-warning" style="vertical-align:top; font-size:13px;">BETA<span></a></em>
+	</div>
+	<div class="collapse navbar-collapse" role="navigation" id="navbar-collapse">
+	  <ul class="nav navbar-nav">
+	    <li><a href="">haha</a></li>
+	  </ul>
+	  <ul class="nav navbar-nav navbar-right">
+	    <li class="dropdown">
+              <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+		<strong>BTC <i class="fa fa-expand"></i></strong></a>
+	      <ul class="dropdown-menu">
+		<li><a href="">BITCOIN</a></li>
+		<li><a href="">LITECOIN</a></li>
+		<li><a href="">DOGECOIN</a></li>
+	      </ul>
+	    </li>
+	  </ul>
+	</div>
+      </div>
+    </div>
+    <div class="container">
+      <div ng-view></div>
+    </div>
+  </body>
+</html>

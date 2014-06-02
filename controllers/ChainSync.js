@@ -3,6 +3,7 @@ var mongodb = require('mongodb');
 var MongoStore = require('../lib/MongoStore');
 var util = bitcore.util;
 var helper = require('../lib/helper');
+var config = require('../lib/config');
 var Peer = bitcore.Peer;
 var PeerManager = bitcore.PeerManager;
 var Script = bitcore.Script;
@@ -175,8 +176,12 @@ ChainSync.prototype.getBlock = function(hash, callback) {
 ChainSync.prototype.run = function() {
   var self = this;
   //peerman.addPeer(new Peer('10.132.63.139', 22556));
-  //peerman.addPeer(new Peer('115.29.186.22', 22556));
-  this.peerman.addPeer(new Peer('192.155.84.55', 22556));
+  var p2pPort = bitcore.networks[this.netname].defaultClientPort;
+  config[this.netname].peers.forEach(function(peerHost){
+    self.peerman.addPeer(new Peer(peerHost, p2pPort));    
+  });
+/*  this.peerman.addPeer(new Peer('115.29.186.22', p2pPort));
+  this.peerman.addPeer(new Peer('192.155.84.55', p2pPort)); */
   this.peerman.on('connection', function(conn) {
     conn.on('inv', self.handleInv.bind(self));
     conn.on('block', self.handleBlock.bind(self));
@@ -283,12 +288,7 @@ ChainSync.prototype.handleVerAck = function(info) {
 
 ChainSync.prototype.getBlocks = function() {
   var self = this;
-  var activeConnections = [];
-  this.peerman.connections.forEach(function(conn) {
-    if(conn.active) {
-      activeConnections.push(conn);
-    }
-  });
+  var activeConnections = this.peerman.getActiveConnections();
   if(activeConnections.length == 0) {
     console.warn('No active connections');
     return;
