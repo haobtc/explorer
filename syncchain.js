@@ -1,28 +1,15 @@
 var bitcore = require('./alliances/bitcore/bitcore');
-var ChainSync = require('./controllers/ChainSync');
+var Node = require('./lib/Node');
 var MongoStore = require('./lib/MongoStore');
 var helper = require('./lib/helper');
 var config = require('./lib/config');
 
-var chainSyncs = {};
+var p2pNodes = {};
 
-MongoStore.initialize(['bitcoin', 'dogecoin'], function(err, netname) {
-/*  var genesisBlock = helper.clone(bitcore.networks[netname].genesisBlock);
-  genesisBlock.hash = helper.reverseBuffer(genesisBlock.hash);
-  genesisBlock.prev_hash = helper.reverseBuffer(genesisBlock.prev_hash);
-  genesisBlock.txes = [];
-*/
-
-/*  store.getBlock(genesisBlock.hash, function(err, block) {
-    if(!block) {
-      //    store.addBlock(genesisBlock);
-      store.pipedPushBlock(genesisBlock, function() {
-      });
-    }
-  }); */
-
-  var chainSync = new ChainSync(netname);
-  chainSync.run();
-  chainSyncs[netname] = chainSync;
+MongoStore.initialize(['bitcoin'], function(err, netname) {
+  var node = new Node(netname);
+  p2pNodes[netname] = node;
+  node.updateMempool = false;
+  node.run();
 });
 
