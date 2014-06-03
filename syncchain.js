@@ -4,7 +4,9 @@ var MongoStore = require('./lib/MongoStore');
 var helper = require('./lib/helper');
 var config = require('./lib/config');
 
-MongoStore.initialize(['bitcoin'], function(err, netname) {
+var chainSyncs = {};
+
+MongoStore.initialize(['bitcoin', 'dogecoin'], function(err, netname) {
 /*  var genesisBlock = helper.clone(bitcore.networks[netname].genesisBlock);
   genesisBlock.hash = helper.reverseBuffer(genesisBlock.hash);
   genesisBlock.prev_hash = helper.reverseBuffer(genesisBlock.prev_hash);
@@ -21,5 +23,6 @@ MongoStore.initialize(['bitcoin'], function(err, netname) {
 
   var chainSync = new ChainSync(netname);
   chainSync.run();
+  chainSyncs[netname] = chainSync;
 });
 

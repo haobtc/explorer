@@ -104,6 +104,9 @@ ChainSync.prototype.saveBlock = function(block, callback) {
 ChainSync.prototype.addBlock = function(block, callback) {
   var self = this;
   console.log('** Block Received **', block.hash.toString('hex'), block.prev_hash.toString('hex'));
+  var genesisBlock = helper.clone(bitcore.networks[self.netname].genesisBlock);
+  var genesisBlockHash = helper.reverseBuffer(genesisBlock.hash).toString('hex');
+
   var col = this.conn.collection('block');
   this.getBlock(block.hash, function(err, aBlock) {
     if(err)
@@ -133,8 +136,11 @@ ChainSync.prototype.addBlock = function(block, callback) {
 	    return callback();
 	  }
 	});
-      } else {
+      } else if(block.hash.toString('hex') == genesisBlockHash) {
 	self.saveBlock(block, callback);
+      } else {
+	self.pendingBlocks[block.hash.toString('hex')] = block;
+	return callback();
       }
     });
   });
@@ -195,9 +201,9 @@ ChainSync.prototype.run = function() {
       if(!self.fifoAddBlock.isCalling()) {
 	self.getBlocks();
       } else {
-	console.info('pushing block');
+	//console.info('pushing block');
       }
-    }, 15000);
+    }, 10000);
     setTimeout(function() {
       self.getBlocks();
     }, 1000);
@@ -245,8 +251,10 @@ ChainSync.prototype.handleBlock = function(info) {
     txObj.vout = tx.outs.map(function(out, i) {
       var txOut = {};
       txOut.s = out.s;
-      var script = new Script(tx.outs[i].s);
-      txOut.addrs = script.getAddrStr(self.netname);
+      if(tx.outs[i].s) {
+	var script = new Script(tx.outs[i].s);
+	txOut.addrs = script.getAddrStr(self.netname);
+      }
       txOut.v = util.valueToBigInt(out.v).toString();
       return txOut;
     });
@@ -264,13 +272,12 @@ ChainSync.prototype.handleBlock = function(info) {
 
 ChainSync.prototype.handleTx = function(info) {
   var tx = info.message.tx.getStandardizedObject();
-//  console.log('** TX Received **', tx);
+  //console.log('** TX Received **', tx);
 };
 
 ChainSync.prototype.handleInv = function(info) {
-/*    console.log('** Inv **');
-    console.log(info.message);
-*/
+//    console.log('** Inv **');
+//    console.log(info.message);
     var invs = info.message.invs;
     info.conn.sendGetData(invs);
 };
@@ -283,14 +290,18 @@ ChainSync.prototype.handleVersion = function(info) {
 };
 
 ChainSync.prototype.handleVerAck = function(info) {
-    console.log('** Verack **', info.message);
+  console.log('** Verack **', info.message);
+/*  var genesisBlock = helper.clone(bitcore.networks[this.netname].genesisBlock);
+  var inv = {type: 2, hash:genesisBlock.hash};
+  console.info('get inv', inv);
+  info.conn.sendGetData([inv]); */
 };
 
 ChainSync.prototype.getBlocks = function() {
   var self = this;
   var activeConnections = this.peerman.getActiveConnections();
   if(activeConnections.length == 0) {
-    console.warn('No active connections');
+    console.warn(this.netname, 'No active connections');
     return;
   }
   var conn = activeConnections[Math.floor(Math.random() * activeConnections.length)];
@@ -303,11 +314,15 @@ ChainSync.prototype.getBlocks = function() {
 	return;
       }
       var gHash = helper.reverseBuffer(latestBlock.hash);
+      conn.sendGetBlocks([gHash], 0);
+      console.info('getting blocks starting from', gHash.toString('hex'), 'to', conn.peer.host);
     } else {
-      var gHash = buffertools.fill(new Buffer(32), 0);
+      //var gHash = buffertools.fill(new Buffer(32), 0);
+      var genesisBlock = helper.clone(bitcore.networks[self.netname].genesisBlock);
+      var inv = {type: 2, hash:genesisBlock.hash};
+      conn.sendGetData([inv]);
+      console.info('getting geneticBlocks', 'to', conn.peer.host);
     }
-    console.info('getting blocks starting from', gHash.toString('hex'), 'to', conn.peer.host);
-    conn.sendGetBlocks([gHash], 0);
   });  
 };
 
