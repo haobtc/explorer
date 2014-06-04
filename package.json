@@ -23,6 +23,7 @@
     "bignum": "~0.7.0",
     "optimist": "~0.6.1",
     "express-json": "~1.0.0",
-    "body-parser": "~1.2.2"
+    "body-parser": "~1.2.2",
+    "bigint": "~0.4.2"
   }
 }
