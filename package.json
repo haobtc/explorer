@@ -24,6 +24,7 @@
     "optimist": "~0.6.1",
     "express-json": "~1.0.0",
     "body-parser": "~1.2.2",
-    "bigint": "~0.4.2"
+    "bigint": "~0.4.2",
+    "async": "~0.9.0"
   }
 }
