@@ -10,6 +10,12 @@
     "db": {
       "url": "mongodb://localhost:27017/blocks_bitcoin"
     }
+  },
+  "litecoin": {
+    "peers": ["115.29.186.22", "192.155.84.55"],
+    "db": {
+      "url": "mongodb://localhost:27017/blocks_litecoin"
+    }
   }
 }
 
