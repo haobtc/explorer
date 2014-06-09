@@ -6,10 +6,11 @@ var config = require('./lib/config');
 
 var p2pNodes = {};
 
-MongoStore.initialize(['bitcoin', 'litecoin', 'dogecoin'], function(err, netname) {
+MongoStore.initialize(['dogecoin'], function(err, netname) {
   var node = new Node(netname);
   p2pNodes[netname] = node;
-  node.updateMempool = false;
+  node.updateMempool = true;
+  node.synchronize = true;
   node.run();
 });
 

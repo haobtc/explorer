@@ -1,5 +1,5 @@
 var argv = require('optimist').argv;
-var server = require('./lib/server');
+var server = argv.s == 'node'?require('./lib/nodeserver'):require('./lib/queryserver');
 
 var domain = require('domain').create();
 domain.on('error', function(err) {
@@ -7,6 +7,6 @@ domain.on('error', function(err) {
 });
 
 domain.run(function() {
-    server.httpServer.listen(argv.p || 9000);
+  server.start(argv);
 });
 
