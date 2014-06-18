@@ -7,7 +7,7 @@ install
 
 ```
 % cd <path/to/explorer>
-% git submodules update --init --recursive
+% git submodule update --init --recursive
 % pushd alliances/bitcore
 % npm install
 % popd
