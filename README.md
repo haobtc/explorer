@@ -2,7 +2,7 @@ explorer
 ==========
 Blockchain for bitcoin and altcoins
 
-install
+Install
 ==========
 
 ```
@@ -15,10 +15,10 @@ install
 % cp config.template.json config.json
 ```
 
-Run
+Run servers
 =======
 
-Start a node server
+Start a node server, node server is a p2p node which synchronize blocks from the coins' blockchain.
 ```
 % node start.js -s node
 ```
@@ -28,7 +28,7 @@ Start a node server at different port and only for dogecoin and bitcoin
 % node start.js -s node -c dogecoin -c bitcoin -p 8335
 ```
 
-For query server 
+Start a query server 
 ```
 % node start.js
 ```
