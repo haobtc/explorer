@@ -1,5 +1,16 @@
 var argv = require('optimist').argv;
-var server = argv.s == 'node'?require('./lib/nodeserver'):require('./lib/queryserver');
+var server;
+switch(argv.s) {
+case 'node':
+  server = require('./lib/nodeserver');
+  break;
+case 'import':
+  server = require('./lib/blockimport');
+  break;
+default:
+  server = require('./lib/queryserver');
+  break;
+}
 
 var domain = require('domain').create();
 domain.on('error', function(err) {
