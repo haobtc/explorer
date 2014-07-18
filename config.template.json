@@ -16,6 +16,18 @@
     "db": {
       "url": "mongodb://localhost:27017/blocks_litecoin"
     }
+  },
+  "darkcoin": {
+      "peers": ["115.29.186.22", "76.23.51.224", "54.187.69.55"],
+      "db": {
+        "url": "mongodb://localhost:27017/blocks_darkcoin"
+      }
+  },
+  "rpc": {
+    "protocol": "http",
+    "pass": "apassword",
+    "host": "127.0.0.1",
+    "port": 8334
   }
 }
 
