@@ -1,0 +1,14 @@
+{
+  "bitcoin": {
+    "peers": ["115.29.186.22", "192.155.84.55"],
+    "db": {
+      "url": "mongodb://localhost:27017/blocks_bitcoin"
+    }
+  },
+  "rpc": {
+    "protocol": "http",
+    "pass": "apassword",
+    "host": "127.0.0.1",
+    "port": 8334
+  }
+}
