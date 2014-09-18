@@ -1,0 +1,8 @@
+# get tx details
+ab -c 100 -n 100 http://192.155.84.55:9000/queryapi/v1/tx/details?bitcoin=f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16
+
+# get unspent
+ab -c 100 -n 100 http://192.155.84.55:9000/queryapi/v1/unspent?addresses=12BsxNw19NzDETzxQuKRNPKT4qmYwcJRZe
+
+# get tx list
+ab -c 100 -n 100 http://192.155.84.55:9000/queryapi/v1/tx/list?addresses=1AJbsFZ64EpEfS5UAjAfcUG8pH8Jn3rn1F
