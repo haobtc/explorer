@@ -1,4 +1,4 @@
-var bitcore = require('./alliances/bitcore/bitcore');
+var bitcore = require('bitcore-multicoin');
 var Node = require('./lib/Node');
 var MongoStore = require('./lib/MongoStore');
 var helper = require('./lib/helper');

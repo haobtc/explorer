@@ -1,6 +1,0 @@
-[submodule "alliances/bitcore"]
-	path = alliances/bitcore
-	url = git@github.com:haobtc/bitcore.git
-[submodule "alliances/skiplist"]
-	path = alliances/skiplist
-	url = https://github.com/superisaac/skiplist.git
