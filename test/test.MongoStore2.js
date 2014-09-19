@@ -1,4 +1,5 @@
 var fs = require('fs');
+var mongodb = require('mongodb');
 var MongoStore = require('../lib/MongoStore2');
 var bitcore = require('../alliances/bitcore/bitcore');
 var helper = require('../lib/helper');
@@ -19,8 +20,11 @@ function getBlock() {
   return b;
 }
 
+console.log('start');
+
 MongoStore.initialize([netname], function(err, netname) {
   console.log('success');
+  store = stores[netname];
   var block = getBlock();
   var blockObj = {
     hash: helper.reverseBuffer(block.calcHash(bitcore.networks[netname].blockHashFunc)),
@@ -33,16 +37,35 @@ MongoStore.initialize([netname], function(err, netname) {
     bits: block.bits
   };
 
-  var self = this;
-
   blockObj.txes = block.txs.map(function(tx, idx) {
     return helper.processTx(netname, tx, idx, blockObj);
   });
 
-  block.isMain = true;
+  blockObj.isMain = true;
 
-  store = stores[netname];
+  /*
   // test insertBlock
+  store.insertBlock(blockObj, function(err, txes) {
+    console.log(txes.length);
 
-  store.dbConn.close();
+    // test getBlock
+    store.getBlock(blockObj.hash, function(err, block) {
+      console.log('get block:hash=%s', block.hash.toString('hex'));
+
+      // test saveBlock
+      block.isMain = false;
+      store.saveBlock(block, function(err) {
+        store.dbConn.close();
+      });
+    });
+  });
+  */
+  store.setTipBlock(blockObj, function(err) {
+    if(err) console.error(err.message);
+    store.getTipBlock(function(err, v) {
+      if(err) console.error(err.message);
+      console.log(v);
+      store.dbConn.close();
+    });
+  });
 });
