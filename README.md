@@ -7,10 +7,6 @@ Install
 
 ```
 % cd <path/to/explorer>
-% git submodule update --init --recursive
-% pushd alliances/bitcore
-% npm install
-% popd
 % npm install
 % cp config.template.json config.json
 ```
