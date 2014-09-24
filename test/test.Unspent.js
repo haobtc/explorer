@@ -28,6 +28,7 @@ MongoStore.initialize([netname], function(err, netname) {
         }
       }
       console.log('count=%d', count);
+      store.dbConn.close();
     });
   });
 });

@@ -63,7 +63,7 @@ function main() {
         };
       });
       async.series(tasks, function(err) {
-        if(err) console.err(err.stack);
+        if(err) console.error(err.stack);
         var store = MongoStore.stores[netname];
         var txCol = store.dbConn.collection('tx');
         txCol.find({'vout.spent':{'$gt':0}}).toArray(function(err, vals) {
