@@ -34,7 +34,7 @@ function main() {
   // prepare test blocks
   var blockReader = new BlockReader(path, netname);
   var maxBlockNum = 2648;
-  blockReader.readBlocks(1000, function(err, vals) {
+  blockReader.readBlocks(171, function(err, vals) {
     for(var i = 0; i < vals.length; ++i) {
       blocks.push(vals[i].block);
     }
@@ -70,6 +70,7 @@ function main() {
           for(var i = 0; i < vals.length; ++i) {
             console.log('spent > 0:' + vals[i].hash.toString('hex'));
           }
+          store.dbConn.close();
         });
       });
     });
