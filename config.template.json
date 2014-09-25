@@ -1,27 +1,29 @@
 {
-  "dogecoin": {
-    "peers": ["115.29.186.22", "192.155.84.55"],
-    "db": {
-      "url": "mongodb://localhost:27017/blocks_dogecoin"
-    }
-  },
-  "bitcoin": {
-    "peers": ["115.29.186.22", "192.155.84.55"],
-    "db": {
-      "url": "mongodb://localhost:27017/blocks_bitcoin"
-    }
-  },
-  "litecoin": {
-    "peers": ["115.29.186.22", "192.155.84.55"],
-    "db": {
-      "url": "mongodb://localhost:27017/blocks_litecoin"
-    }
-  },
-  "darkcoin": {
-      "peers": ["115.29.186.22", "76.23.51.224", "54.187.69.55"],
+  "networks" : {
+    "dogecoin": {
+      "peers": ["115.29.186.22", "192.155.84.55"],
       "db": {
-        "url": "mongodb://localhost:27017/blocks_darkcoin"
+        "url": "mongodb://localhost:27017/blocks_dogecoin"
       }
+    },
+    "bitcoin": {
+      "peers": ["115.29.186.22", "192.155.84.55"],
+      "db": {
+        "url": "mongodb://localhost:27017/blocks_bitcoin"
+      }
+    },
+    "litecoin": {
+      "peers": ["115.29.186.22", "192.155.84.55"],
+      "db": {
+        "url": "mongodb://localhost:27017/blocks_litecoin"
+      }
+    },
+    "darkcoin": {
+        "peers": ["115.29.186.22", "76.23.51.224", "54.187.69.55"],
+        "db": {
+          "url": "mongodb://localhost:27017/blocks_darkcoin"
+        }
+    }
   },
   "rpc": {
     "protocol": "http",

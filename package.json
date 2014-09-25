@@ -29,6 +29,7 @@
     "underscore": "~1.6.0",
     "glob": "~4.0.2",
     "getenv": "~0.3.0",
+    "basic-auth" : "~1.0.0",
     "socket.io": "~1.0.6"
   }
 }
