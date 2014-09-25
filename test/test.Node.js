@@ -1,5 +1,6 @@
 var bitcore = require('../alliances/bitcore/bitcore');
 var Block = bitcore.Block;
+var Script = bitcore.Script;
 var BlockReader = require('../lib/BlockReader');
 var helper = require('../lib/helper');
 var MongoStore = require('../lib/MongoStore2');
@@ -50,7 +51,7 @@ function main() {
     // prepare
     MongoStore.initialize([netname], function(err, netname) {
       var node = new Node(netname);
-      var tasks = blockObjs.map(function(blockObj) {
+      var tasks = blockObjs.map(function(blockObj,i) {
         return function(c) {
           node.storeTipBlock(blockObj, true, function(err) {
             if(err) {
@@ -62,15 +63,28 @@ function main() {
           });
         };
       });
-      async.series(tasks, function(err) {
+      var newTasks = [];
+      for(var i = 0; i < 9; ++i) newTasks.push(tasks[i]);
+      async.series(newTasks, function(err) {
         if(err) console.error(err.stack);
-        var store = MongoStore.stores[netname];
-        var txCol = store.dbConn.collection('tx');
-        txCol.find({'vout.spent':{'$gt':0}}).toArray(function(err, vals) {
-          for(var i = 0; i < vals.length; ++i) {
-            console.log('spent > 0:' + vals[i].hash.toString('hex'));
-          }
-          store.dbConn.close();
+        var newTx = blockObjs[170].txes[1];
+        node.sendTxTest(newTx, function(err, txHash) {
+          if(err) return console.err(err.stack);
+          console.log('txHash=%s', txHash);
+          async.series([tasks[9]], function(err) {
+            if(err) console.error(err);
+            var store = MongoStore.stores[netname];
+            var txCol = store.dbConn.collection('tx');
+            txCol.find({'vout.spent':{'$gt':0}}).toArray(function(err, vals) {
+              for(var i = 0; i < vals.length; ++i) {
+                console.log('spent > 0:' + vals[i].hash.toString('hex'));
+              }
+              console.log('tx.vin', newTx.vin);
+              var script = new Script(newTx.vin[0].s);
+              console.log('in addrs=', script);
+              store.dbConn.close();
+            });
+          });
         });
       });
     });
