@@ -66,7 +66,7 @@ function main() {
       var newTasks = [];
       for(var i = 0; i < 9; ++i) newTasks.push(tasks[i]);
       async.series(newTasks, function(err) {
-        if(err) console.error(err.stack);
+        if(err) return console.error(err.stack);
         var newTx = blockObjs[170].txes[1];
         node.sendTxTest(newTx, function(err, txHash) {
           if(err) return console.err(err.stack);
@@ -79,9 +79,6 @@ function main() {
               for(var i = 0; i < vals.length; ++i) {
                 console.log('spent > 0:' + vals[i].hash.toString('hex'));
               }
-              console.log('tx.vin', newTx.vin);
-              var script = new Script(newTx.vin[0].s);
-              console.log('in addrs=', script);
               store.dbConn.close();
             });
           });
