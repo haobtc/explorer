@@ -64,10 +64,11 @@ function main() {
         };
       });
       var newTasks = [];
-      for(var i = 0; i < 9; ++i) newTasks.push(tasks[i]);
-      async.series(newTasks, function(err) {
+      //for(var i = 0; i < tasks.length; ++i) newTasks.push(tasks[i]);
+      async.series(tasks, function(err) {
         if(err) return console.error(err.stack);
-        var newTx = blockObjs[170].txes[1];
+        MongoStore.stores[netname].dbConn.close();
+        /*var newTx = blockObjs[170].txes[1];
         node.sendTxTest(newTx, function(err, txHash) {
           if(err) return console.err(err.stack);
           console.log('txHash=%s', txHash);
@@ -83,6 +84,7 @@ function main() {
             });
           });
         });
+        */
       });
     });
   });
