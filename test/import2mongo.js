@@ -24,22 +24,27 @@ function toBlockObj(b, height, netname) {
 }
 
 function startImport(netname) {
-  var path = '/home/fred/' + netname;
+  var path = '/home/yulei/' + netname;
   var blockReader = new BlockReader(path, netname);
   var height = 0;
   var node = new Node(netname);
-  var cblock;
+  var finish = false;
   var times = 0;
+  var blockCnt = 0;
+  var txCnt = 0;
+  var onceReadBlockCnt = 2000;
   async.doWhilst(function(c) {
-    blockReader.readBlocks(100, function(err, blocks) {
+    console.log('readBlocks');
+    blockReader.readBlocks(onceReadBlockCnt, function(err, blocks) {
       if(err) return c(err);
       var tasks = blocks.map(function(b) {
         return function(c) {
           var blockObj = toBlockObj(b.block, height, netname);
           ++height;
+          var tmp = blockObj.txes.length;
           node.storeTipBlock(blockObj, true, function(err) {
             if(err) return c(err);
-            cblock = b;
+            txCnt = txCnt + tmp;
             c();
           });
         };
@@ -47,12 +52,15 @@ function startImport(netname) {
       async.series(tasks, function(err) {
         if(err) return c(err);
         ++times;
+        blockCnt = blockCnt + blocks.length;
+        if(blocks.length !== onceReadBlockCnt) finish = true;
         c();
       });
     });
   },
   function() {
-    return cblock && times < 2000;
+    if(finish) console.log('finished:blocksCnt=%d:txCnt=%d', blockCnt, txCnt);
+    return !finish;
   },
   function(err) {
     if(err) console.error(err);
