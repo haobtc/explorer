@@ -1,4 +1,4 @@
-var block_height = 370880;
+var block_height = 372463;
 
 db.block.find({height: {$gt: block_height}}).forEach(function(b) {
   db.tx.remove({bhash: b.hash});
