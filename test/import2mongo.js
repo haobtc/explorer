@@ -23,16 +23,18 @@ function toBlockObj(b, height, netname) {
   return blockObj;
 }
 
+var blockCnt = 0;
+
 function startImport(netname) {
-  var path = '/home/yulei/' + netname;
+  var path = '/home/fred/' + netname;
   var blockReader = new BlockReader(path, netname);
   var height = 0;
   var node = new Node(netname);
   var finish = false;
   var times = 0;
-  var blockCnt = 0;
   var txCnt = 0;
   var onceReadBlockCnt = 2000;
+  var start = new Date();
   async.doWhilst(function(c) {
     console.log('readBlocks');
     blockReader.readBlocks(onceReadBlockCnt, function(err, blocks) {
@@ -53,6 +55,7 @@ function startImport(netname) {
         if(err) return c(err);
         ++times;
         blockCnt = blockCnt + blocks.length;
+        if(blockCnt % 1000 == 0) console.log('blockCnt=%d:cost=%d', blockCnt, (new Date() - start)/1000);
         if(blocks.length !== onceReadBlockCnt) finish = true;
         c();
       });

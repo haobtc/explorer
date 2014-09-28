@@ -42,11 +42,6 @@ function main() {
     toBlockObj();
     for(var i = 0; i < blockObjs.length; ++i) {
       var blockObj = blockObjs[i];
-      //console.log(blockObj.txes[0]);
-      if(blockObj.txes.length > 1) {
-        console.log('idx=%d:hash=%s', i+1, blockObj.hash.toString('hex'));
-        console.log(blockObj.txes.length);
-      }
     }
     // prepare
     MongoStore.initialize([netname], function(err, netname) {
