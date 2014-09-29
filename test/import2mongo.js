@@ -56,7 +56,10 @@ function startImport(netname) {
         ++times;
         blockCnt = blockCnt + blocks.length;
         if(blockCnt % 1000 == 0) console.log('blockCnt=%d:cost=%d', blockCnt, (new Date() - start)/1000);
-        if(blocks.length !== onceReadBlockCnt) finish = true;
+        if(blocks.length !== onceReadBlockCnt) {
+          console.log('blockCnt=%d:cost=%d', blockCnt, (new Date() - start)/1000);
+          finish = true;
+        }
         c();
       });
     });
