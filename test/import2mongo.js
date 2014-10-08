@@ -26,7 +26,7 @@ function toBlockObj(b, height, netname) {
 var blockCnt = 0;
 
 function startImport(netname) {
-  var path = '/home/fred/' + netname;
+  var path = '/home/yulei/' + netname;
   var blockReader = new BlockReader(path, netname);
   var height = 0;
   var node = new Node(netname);
@@ -36,7 +36,6 @@ function startImport(netname) {
   var onceReadBlockCnt = 2000;
   var start = new Date();
   async.doWhilst(function(c) {
-    console.log('readBlocks');
     blockReader.readBlocks(onceReadBlockCnt, function(err, blocks) {
       if(err) return c(err);
       var tasks = blocks.map(function(b) {
@@ -45,6 +44,7 @@ function startImport(netname) {
           ++height;
           var tmp = blockObj.txes.length;
           node.storeTipBlock(blockObj, true, function(err) {
+          //node.addNewBlock(blockObj, function(err) {
             if(err) return c(err);
             txCnt = txCnt + tmp;
             c();
