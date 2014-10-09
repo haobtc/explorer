@@ -38,6 +38,7 @@ MongoStore.initialize([netname], function(err, netname) {
     for(var i = 0; i < vals.length; ++i) {
       blockObjs.push(toBlockObj(vals[i].block, i));
     }
+    var txHash = blockObjs[170].txes[1].hash;
     var tasks = blockObjs.map(function(b) {
       return function(c) {
         node.storeTipBlock(b, true, function(err) {
@@ -46,13 +47,13 @@ MongoStore.initialize([netname], function(err, netname) {
         });
       };
     });
-    var newTasks = tasks.slice(0, 9);
-    async.series(newTasks, function(err) {
+    async.series(tasks, function(err) {
       if(err) console.error(err);
-      var tx = blockObjs[170].txes[1];
-      node.sendTxTest(tx, function(err, txHash) {
+      var txCol = store.dbConn.collection('tx');
+      txCol.find({hash:txHash}).toArray(function(err, txes) {
         if(err) console.error(err);
-        async.series([tasks[9]], function(err) {
+        var tx = txes[0];
+        node._onTxDel(tx, function(err) {
           if(err) console.error(err);
           store.dbConn.close();
         });

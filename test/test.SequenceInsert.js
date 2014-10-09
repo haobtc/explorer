@@ -41,8 +41,7 @@ MongoStore.initialize([netname], function(err, netname) {
     var tasks = blockObjs.map(function(b) {
       return function(c) {
         node.storeTipBlock(b, true, function(err) {
-          if(err) return console.log('block store fail:hash=%s', b.hash.toString('hex'));
-          console.log('block store success:hash=%s', b.hash.toString('hex'));
+          if(err) console.error(err);
           c();
         });
       };

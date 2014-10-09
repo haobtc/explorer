@@ -26,10 +26,23 @@ function toBlockObj(b, height, netname) {
 var blockCnt = 0;
 
 function startImport(netname) {
-  var path = '/home/yulei/' + netname;
+  var path = '/home/fred/' + netname;
   var blockReader = new BlockReader(path, netname);
   var height = 0;
   var node = new Node(netname);
+  node.processTxTimer = setInterval(function() {
+    if(node.processingSpent) return;
+    node.processingSpent = true;
+    node._processSpent(function(err, finish) {
+      if(err) console.error(err);
+      if(finish) {
+        console.log('total time=%d', (new Date()-start)/1000);
+        clearInterval(node.processTxTimer);
+        process.exit();
+      }
+      node.processingSpent = false;
+    });
+  }, 1000);
   var finish = false;
   var times = 0;
   var txCnt = 0;
@@ -55,7 +68,8 @@ function startImport(netname) {
         if(err) return c(err);
         ++times;
         blockCnt = blockCnt + blocks.length;
-        if(blockCnt % 1000 == 0) console.log('blockCnt=%d:cost=%d', blockCnt, (new Date() - start)/1000);
+        if(blockCnt % 1000 == 0) console.log('blockCnt=%d:txCnt=%d:cost=%d', blockCnt, txCnt, (new Date() - start)/1000);
+        //if(blockCnt === 50000) finish = true;
         if(blocks.length !== onceReadBlockCnt) {
           console.log('blockCnt=%d:cost=%d', blockCnt, (new Date() - start)/1000);
           finish = true;
@@ -65,7 +79,9 @@ function startImport(netname) {
     });
   },
   function() {
-    if(finish) console.log('finished:blocksCnt=%d:txCnt=%d', blockCnt, txCnt);
+    if(finish) {
+      console.log('finished:blocksCnt=%d:txCnt=%d:totalCost=%d', blockCnt, txCnt, (new Date()-start)/1000);
+    }
     return !finish;
   },
   function(err) {
