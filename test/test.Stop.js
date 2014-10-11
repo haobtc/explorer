@@ -9,7 +9,7 @@ q1.task({key:1},
           setTimeout(function() {
             console.log('task1 executed');
             c();
-          }, 5000);
+          }, 10000);
         }, {info:1});
 
 q2.task({key:2},
@@ -17,7 +17,7 @@ q2.task({key:2},
           setTimeout(function() {
             console.log('task2 executed');
             c();
-          }, 10000);
+          }, 20000);
         }, {info:1});
 
 function stop(cb) {
@@ -55,3 +55,4 @@ function stopNode() {
 }
 
 process.on('SIGINT', stopNode);
+process.on('SIGTERM', stopNode);
