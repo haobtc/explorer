@@ -7,6 +7,9 @@ case 'node':
 case 'import':
   server = require('./lib/blockimport');
   break;
+case 'update':
+  server = require('./lib/updatespent');
+  break;
 default:
   server = require('./lib/queryserver');
   break;
