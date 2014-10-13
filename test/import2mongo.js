@@ -26,11 +26,11 @@ function toBlockObj(b, height, netname) {
 var blockCnt = 0;
 
 function startImport(netname) {
-  var path = '/home/fred/' + netname;
+  var path = '/home/yulei/' + netname;
   var blockReader = new BlockReader(path, netname);
   var height = 0;
   var node = new Node(netname);
-  node.processTxTimer = setInterval(function() {
+  /*node.processTxTimer = setInterval(function() {
     if(node.processingSpent) return;
     node.processingSpent = true;
     node._processSpent(function(err, finish) {
@@ -42,7 +42,7 @@ function startImport(netname) {
       }
       node.processingSpent = false;
     });
-  }, 1000);
+  }, 1000);*/
   var finish = false;
   var times = 0;
   var txCnt = 0;
