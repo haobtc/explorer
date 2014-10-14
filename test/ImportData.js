@@ -86,7 +86,7 @@ function flush2DB(cb) {
           {upsert: true, new: true},
           function(err, b) {
             if(err) return c(err);
-            console.info('insert block:hash=%s', b.hash.toString('hex'));
+            console.info('insert block:hash=%s:height=%d', b.hash.toString('hex'), b.height);
             txCol.insert(txes, function(err) {
               if(err) return c(err);
               ++i;
@@ -96,7 +96,7 @@ function flush2DB(cb) {
       }, function() {
         return i < n;
       }, function(err) {
-        if(err) console.error(err);
+        if(err) return cc(err);
         cc();
       });
     }
