@@ -1,0 +1,12 @@
+已完成的工作:
+1.原来的nodeserver改成了cluster模式，实现在lib/nodeserverCluster.js中
+2.nodeserver.js负责向peer获取block和响应其他btc网络节点的事件
+3.BlockInserter.js负责将block数据转换成结构化的数据并将其放到数据库中
+4.更新spent和address的工作用另外一个进程来做，实现在lib/updatespent.js中
+
+现存的问题:
+向peer请求的block目前还不够准确，所以BlockInserter的压力不够。
+k初步想法是给每个已经发送过请求的peer维护一个状态，包括：
+a)missCount，不在tip范围内的block的数量
+b)连接状态
+根据以上信息和BlockInserter的压力向新的peer取block.
