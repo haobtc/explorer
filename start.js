@@ -2,13 +2,10 @@ var argv = require('optimist').argv;
 var server;
 switch(argv.s) {
 case 'node':
-  server = require('./lib/nodeserver');
-  break;
-case 'import':
-  server = require('./lib/blockimport');
+  server = require('./bin/nodeserver');
   break;
 default:
-  server = require('./lib/queryserver');
+  server = require('./bin/queryserver');
   break;
 }
 

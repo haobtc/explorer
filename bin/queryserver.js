@@ -2,14 +2,14 @@ var express = require('express');
 var http = require('http');
 var _ = require('underscore');
 var bitcore = require('bitcore-multicoin');
-var config = require('./config');
+var config = require('../lib/config');
 var async = require('async');
 var app = express();
 var bodyParser = require('body-parser');
-var Query = require('./Query');
-var Stream = require('./Stream');
-var MongoStore = require('./MongoStore');
-var helper = require('./helper');
+var Query = require('../lib/Query');
+var Stream = require('../lib/Stream');
+var MongoStore = require('../lib/MongoStore');
+var helper = require('../lib/helper');
 
 app.use(bodyParser());
 app.use(function(err, req, res, next){

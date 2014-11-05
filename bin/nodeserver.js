@@ -1,10 +1,10 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var bitcore = require('bitcore-multicoin');
-var MongoStore = require('./MongoStore');
-var NodeSet = require('./NodeSet');
-var helper = require('./helper');
-var config = require('./config');
+var MongoStore = require('../lib/MongoStore');
+var NodeSet = require('../lib/NodeSet');
+var helper = require('../lib/helper');
+var config = require('../lib/config');
 
 var nodeSet = new NodeSet();
 
