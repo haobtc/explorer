@@ -32,6 +32,6 @@
     "optimist": "~0.6.1",
     "socket.io": "~1.0.6",
     "underscore": "~1.6.0",
-    "basic-auth": "~1.0.0"
+    "multijson-config": "~0.1.6"
   }
 }
