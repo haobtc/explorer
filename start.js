@@ -4,6 +4,9 @@ switch(argv.s) {
 case 'node':
   server = require('./bin/nodeserver');
   break;
+case 'fetch':
+  server = require('./bin/fetchblock');
+  break;
 default:
   server = require('./bin/queryserver');
   break;
