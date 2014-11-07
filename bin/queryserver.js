@@ -1,6 +1,6 @@
 var express = require('express');
+var cluster = require('cluster');
 var http = require('http');
-var _ = require('underscore');
 var bitcore = require('bitcore-multicoin');
 var config = require('../lib/config');
 var async = require('async');
@@ -20,13 +20,13 @@ app.use(function(err, req, res, next){
 app.use('/explorer/', express.static('public'));
 
 function sendJSONP(req, res, obj) {
-    if(req.query.callback && /^\w+$/.test(req.query.callback)) {
-        res.set('Content-Type', 'text/javascript');
-        res.send(req.query.callback + '(' + JSON.stringify(obj) + ');');
-    } else {
-        res.set('Content-Type', 'application/json');
-        res.send(obj);
-    }
+  if(req.query.callback && /^\w+$/.test(req.query.callback)) {
+    res.set('Content-Type', 'text/javascript');
+    res.send(req.query.callback + '(' + JSON.stringify(obj) + ');');
+  } else {
+    res.set('Content-Type', 'application/json');
+    res.send(obj);
+  }
 }
 
 // Get TxDetails
@@ -255,7 +255,7 @@ app.get('/:netname/nodes.json', function(req, res) {
   });
 });
 
-module.exports.start = function(argv){
+function startServer(argv){
   var netnames = argv.c;
   if(typeof netnames == 'string') {
     netnames = [netnames];
@@ -276,3 +276,21 @@ module.exports.start = function(argv){
   });
   server.listen(argv.p || 9000);
 }
+
+module.exports.start = function(argv){
+  var numWorkers = argv.n || 1;
+  numWorkers = parseInt(numWorkers);
+  if(cluster.isMaster) {
+    console.info('start', numWorkers, 'workers');
+    for(var i=0; i<numWorkers; i++) {
+      cluster.fork();
+    }
+    cluster.on('exit', function(worker, code, signal) {
+      console.log('work ' + worker.process.pid + ' died');
+    });
+  } else {
+    startServer(argv);
+  }
+}
+
+

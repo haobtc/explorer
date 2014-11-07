@@ -9,7 +9,7 @@ var BlockFetcher = require('../lib/BlockFetcher');
 module.exports.start = function(argv){
   var netname = argv.c;
   var blockHash = new Buffer(argv.b, 'hex');
-
+  
   MongoStore.initialize([netname], function(err, netname) {
     if(err) throw err;
   }, function(err) {
