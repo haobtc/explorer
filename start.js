@@ -7,6 +7,9 @@ case 'node':
 case 'fetch':
   server = require('./bin/fetchblock');
   break;
+case 'chain':
+  server = require('./bin/chainserver');
+  break;
 default:
   server = require('./bin/queryserver');
   break;
