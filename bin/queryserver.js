@@ -1,4 +1,5 @@
 var express = require('express');
+
 var cluster = require('cluster');
 var http = require('http');
 var bitcore = require('bitcore-multicoin');
@@ -170,57 +171,20 @@ function getTXList(req, res) {
 app.get('/queryapi/v1/tx/list', getTXList);
 app.post('/queryapi/v1/tx/list', getTXList);
 
-
-function sendRawTx(netname, rawtx, callback) {
-  try {
-    var parser = new bitcore.BinaryParser(new Buffer(rawtx, 'hex'));
-  } catch(err) {
-    console.error(err);
-    return callback(err);
-  }
-  var tx = new bitcore.Transaction();
-  tx.parse(parser);
-  if(tx.serialize().toString('hex') !== rawtx) {
-    callback(undefined, {code: -1, message: 'TX rejected'});
-  } else {
-    var txObj = helper.processTx(netname, tx);
-    var store = MongoStore.stores[netname];
-    store.getTx(txObj.hash, true, function(err, obj) {
-      if(err) return callback(err);
-      if(obj) return callback(undefined,
-			      {code:-5, message: 'transaction already in block chain.'});
-
-      var col = store.dbconn.collection('mempool');
-      txObj.raw = tx.serialize();
-      txObj.pending = true;
-      col.findAndModify({'hash': txObj.hash}, [],
-			{$set: txObj},
-			{upsert: true},
-			function(err, obj) {
-			  if(err) callback(err, false);
-			  //callback(undefined, {code:0, message:txObj.hash.toString('hex')});
-			  callback(undefined, txObj.hash.toString('hex'));
-			});
-    });
-  }
-}
-
-function sendTx(req, res) {
+function sendTx(req, res, next) {
   var query = req.query;
   if(req.method == 'POST') {
     query = req.body;
   }
-  sendRawTx(req.params.netname, query.rawtx, function(err, ret) {
+  Query.addRawTx(req.params.netname, query.rawtx, function(err, ret) {
     if(err) {
-      res.status(500).send({code:-1, message: err.message});
-      return;
+      console.error('hhhh', err);
+      return next(err);
     }
+    
     if(ret != undefined) {
-      if(ret.code != undefined && ret.code < 0) {
-	res.status(400).send(ret);
-      } else {
-	res.send(ret);
-      }
+      console.info('send', ret);
+      res.send(ret);
     } else {
       res.status(400).send('Failed');
     }
@@ -231,9 +195,13 @@ app.get('/queryapi/v1/sendtx/:netname', sendTx);
 app.post('/queryapi/v1/sendtx/:netname', sendTx);
 
 Stream.addRPC('sendtx', function(rpc, network, rawtx) {
-  sendRawTx(network, rawtx, function(err, txid) {
+  Query.addRawTx(network, rawtx, function(err, txid) {
     if(err) {
-      rpc.send({'error': err.message});
+      if(err instanceof helper.UserError) {
+	rpc.send({code: err.code, 'error': err.message});
+      } else {
+	rpc.send({'error': err.message});
+      }
     } else {
       rpc.send({'txid': txid});
     }
@@ -255,6 +223,15 @@ app.get('/:netname/nodes.json', function(req, res) {
   });
 });
 
+app.use(function(err, req, res, next){
+  if(err instanceof helper.UserError) {
+    res.status(400).send({code: err.code, error: err.message});
+  } else {
+    console.error('EEE', err.stack);
+    res.status(500).send({error: err.message});
+  }
+});
+
 function startServer(argv){
   var netnames = argv.c;
   if(typeof netnames == 'string') {
@@ -272,7 +249,7 @@ function startServer(argv){
       });
     }, 3000 + 2000 * Math.random());
   }, function() {
-    Stream.createStream(server, netnames);
+    //Stream.createStream(server, netnames);
   });
   server.listen(argv.p || 9000);
 }
@@ -292,5 +269,4 @@ module.exports.start = function(argv){
     startServer(argv);
   }
 }
-
 
