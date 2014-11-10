@@ -8,15 +8,11 @@ var async = require('async');
 var app = express();
 var bodyParser = require('body-parser');
 var Query = require('../lib/Query');
-var Stream = require('../lib/Stream');
+//var Stream = require('../lib/Stream');
 var MongoStore = require('../lib/MongoStore');
 var helper = require('../lib/helper');
 
 app.use(bodyParser());
-app.use(function(err, req, res, next){
-  console.error(err.stack);
-  res.send({error: true});
-});
 
 app.use('/explorer/', express.static('public'));
 
@@ -194,7 +190,7 @@ function sendTx(req, res, next) {
 app.get('/queryapi/v1/sendtx/:netname', sendTx);
 app.post('/queryapi/v1/sendtx/:netname', sendTx);
 
-Stream.addRPC('sendtx', function(rpc, network, rawtx) {
+/*Stream.addRPC('sendtx', function(rpc, network, rawtx) {
   Query.addRawTx(network, rawtx, function(err, txid) {
     if(err) {
       if(err instanceof helper.UserError) {
@@ -207,6 +203,7 @@ Stream.addRPC('sendtx', function(rpc, network, rawtx) {
     }
   });
 });
+*/
 
 app.get('/:netname/nodes.txt', function(req, res) {
   var store = MongoStore.stores[req.params.netname];
@@ -269,4 +266,3 @@ module.exports.start = function(argv){
     startServer(argv);
   }
 }
-
