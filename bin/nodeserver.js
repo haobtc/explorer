@@ -13,33 +13,10 @@ module.exports.start = function(argv){
   if(typeof coins == 'string') {
     coins = [coins];
   }
-  var sync = true;
-  var blockHash;
-  if(argv.b) {
-    sync = false;
-    blockHash = new Buffer(argv.b, 'hex');
-    console.info(blockHash.toString('hex') == argv.b);
-  }
   nodeSet.run(coins||helper.netnames(), function(node) {
-    node.updateMempool = true;
+    node.updateMempool = false;
     node.allowOldBlock = false;
-    if(sync) {
-      node.synchronize = true;
-    } else {
-      node.synchronize = false;
-      node.addBlocks = false;
-      node.fetchBlock(blockHash, function(blockObj) {
-	console.info('got block', blockObj.txes.length);
-	node.updateBlock(blockObj, function(err) {
-	  if(err) {
-	    console.info(err);
-	    throw err;
-	  }
-	  console.info('updated');
-	  process.exit();
-	});
-      });
-    }
+    node.synchronize = true;
   }, function(err) {
     if(err) throw err;
     function stopNode() {
