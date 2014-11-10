@@ -14,7 +14,7 @@ module.exports.start = function(argv){
     coins = [coins];
   }
   nodeSet.run(coins||helper.netnames(), function(node) {
-    node.updateMempool = true;
+    node.updateMempool = false;
     node.allowOldBlock = false;
     node.synchronize = true;
   }, function(err) {
