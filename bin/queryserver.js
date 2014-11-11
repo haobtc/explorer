@@ -239,12 +239,6 @@ function startServer(argv){
   var server = http.Server(app);
   MongoStore.initialize(netnames, function(err, netname) {
     if(err) throw err;
-    setInterval(function() {
-      var store = MongoStore.stores[netname];
-      store.queryMaxHeight(function(err, height) {
-	if(err) throw err;
-      });
-    }, 3000 + 2000 * Math.random());
   }, function() {
     //Stream.createStream(server, netnames);
   });

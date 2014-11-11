@@ -7,27 +7,41 @@ var MongoStore = require('../lib/MongoStore');
 var helper = require('../lib/helper');
 
 var app = express();
+
+app.use(function(req, res, next) {
+  if(req.method == 'POST') {
+    req.rawBody = '';
+    req.setEncoding('utf8');
+    req.on('data', function(chunk) { 
+      req.rawBody += chunk;
+    });
+
+    req.on('end', function() {
+      next();
+    });
+  } else {
+    next();
+  }
+});
+
 var bodyParser = require('body-parser');
 app.use(bodyParser({limit: '50mb'}));
 
 var blockChains = {};
 
-app.get('/stats/:netname', function(req, res, next) {
+app.get('/stats/:netname', function(req, res) {
   var blockChain = blockChains[req.params.netname];
-  blockChain.store.queryMaxHeight(function(err) {
-    if(err) return next(err);
-    res.send({
-      'queueSize':  blockChain.blockQueue.size(),
-      'tipTimestamp': blockChain.store.tipTimestamp,
-      'maxHeight': blockChain.store.maxHeight
-    });
+  res.send({
+    'queueSize':  blockChain.blockQueue.size(),
+    'tipTimestamp': blockChain.store.stats.tipTimestamp,
+    'maxHeight': blockChain.store.stats.maxHeight
   });
 });
 
 app.post('/blocks/:netname', function(req, res, next) {
   var self = this;
   var blockChain = blockChains[req.params.netname];
-  var parser = new bitcore.BinaryParser(new Buffer(req.body.raw, 'hex'));
+  var parser = new bitcore.BinaryParser(new Buffer(req.rawBody, 'binary'));
   var block = new bitcore.Block();
   block.parse(parser);
 
@@ -48,7 +62,7 @@ app.post('/blocks/:netname', function(req, res, next) {
   blockObj.txes = block.txs.map(function(tx, idx) {
     return helper.processTx(blockChain.netname, tx, idx, blockObj);
   });
-
+  blockObj.cntTxes = blockObj.txes.length;
   blockChain.enqueueBlock({blockObj:blockObj});
   res.send('ok');
 });
@@ -98,6 +112,6 @@ module.exports.start = function(argv) {
   });
   
   var server = http.Server(app);
-  server.listen(argv.p || 19000, argv.h || 'localhost');
+  server.listen(parseInt(argv.p || 19000), argv.h || 'localhost');
 
 };
