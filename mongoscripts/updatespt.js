@@ -24,7 +24,9 @@ for(var i=0; i<5000; i++) {
   var hasBlock = false;
   blocks.forEach(function(block) {
     hasBlock = true;
-    processBlock(block);
+    if(block.isMain){
+      processBlock(block);
+    }
   });
   if(!hasBlock) {
     break;
