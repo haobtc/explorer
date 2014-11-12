@@ -172,7 +172,14 @@ function sendTx(req, res, next) {
   if(req.method == 'POST') {
     query = req.body;
   }
-  Query.addRawTx(req.params.netname, query.rawtx, function(err, ret) {
+  var info = {};
+  if(query.remote_address) {
+    info.remote_address = query.remote_address;
+  }
+  if(query.note) {
+    info.note = query.note;
+  }
+  Query.addRawTx(req.params.netname, query.rawtx, info, function(err, ret) {
     if(err) {
       console.error('hhhh', err);
       return next(err);
@@ -190,7 +197,8 @@ function sendTx(req, res, next) {
 app.get('/queryapi/v1/sendtx/:netname', sendTx);
 app.post('/queryapi/v1/sendtx/:netname', sendTx);
 
-/*Stream.addRPC('sendtx', function(rpc, network, rawtx) {
+/*
+Stream.addRPC('sendtx', function(rpc, network, rawtx) {
   Query.addRawTx(network, rawtx, function(err, txid) {
     if(err) {
       if(err instanceof helper.UserError) {
