@@ -26,8 +26,10 @@ for(var i=0; i<5000; i++) {
     hasBlock = true;
     if(block.isMain){
       processBlock(block);
+    } else {
+      db.block.update({hash: block.hash}, {$set: {processed: true}})
     }
-  });
+  }); 
   if(!hasBlock) {
     break;
   }
