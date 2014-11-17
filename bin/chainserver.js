@@ -97,7 +97,7 @@ module.exports.start = function(argv) {
   }
   netnames = netnames || helper.netnames();
 
-  MongoStore.initialize(netnames, function(err, netname) {
+  MongoStore.initialize(helper.netnames(), function(err, netname) {
     blockChains[netname] = new BlockChain(netname);
   }, function(err) {
     function stopChains() {
@@ -113,5 +113,4 @@ module.exports.start = function(argv) {
   
   var server = http.Server(app);
   server.listen(parseInt(argv.p || 19000), argv.h || 'localhost');
-
 };
