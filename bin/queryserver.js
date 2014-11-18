@@ -107,6 +107,24 @@ function getTxDetailsSinceID(req, res) {
 app.get('/queryapi/v1/tx/since', getTxDetailsSinceID);
 app.post('/queryapi/v1/tx/since', getTxDetailsSinceID);
 
+function getTxTimelineForNetwork(req, res) {
+  var netname = req.params.netname;
+  var since = req.query.since;
+  var store = MongoStore.stores[netname];
+  
+  Query.getTxDetailsSinceID(store, since, function(err, arr) {
+    if(err) throw err;
+    var txlist = arr || [];
+    sendJSONP(req, res, txlist);
+  });
+}
+app.get('/queryapi/v1/tx/:netname/timeline', getTxTimelineForNetwork);
+app.get('/queryapi/v1/tx/:netname/since', getTxTimelineForNetwork);  // For backward compitable
+
+app.get('/queryapi/v1/mempool/:netname/since', function(req, res) {
+  res.send([]);
+});
+
 // Get unspent
 function getUnspent(req, res) {
   var query = req.query;

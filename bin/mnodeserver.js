@@ -37,11 +37,15 @@ module.exports.start = function(argv){
 
   if(cluster.isMaster) {
     coins.forEach(function(netname) {
-      cluster.fork({'PARG': netname,
-		    'REMOTE_CHAIN_URL': 'http://localhost:' + startPort});
-      cluster.fork({'PARG': 'p2p',
-		    'PORT': startPort});
-      startPort++;
+      if(config.networks[netname].remoteBlockChain.enabled) {
+	cluster.fork({'PARG': netname,
+		      'REMOTE_CHAIN_URL': 'http://localhost:' + startPort});
+	cluster.fork({'PARG': 'p2p',
+		      'PORT': startPort});
+	startPort++;
+      } else {
+	cluster.fork({'PARG': netname});
+      }
     });
   } else {
     if(process.env.PARG == 'p2p') {

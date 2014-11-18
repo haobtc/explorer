@@ -6,7 +6,7 @@
 	"url": "mongodb://localhost:27017/blocks_dogecoin"
       },
       "remoteBlockChain": {
-        "enabled": true,
+        "enabled": false,
         "url": "http://localhost:19000"
       }     
     },
@@ -16,7 +16,7 @@
 	"url": "mongodb://localhost:27017/blocks_bitcoin"
       },
       "remoteBlockChain": {
-        "enabled": true,
+        "enabled": false,
         "url": "http://localhost:19000"
       }
     },
@@ -26,7 +26,7 @@
 	"url": "mongodb://localhost:27017/blocks_litecoin"
       },
       "remoteBlockChain": {
-        "enabled": true,
+        "enabled": false,
         "url": "http://localhost:19000"
       }
     },
@@ -36,7 +36,7 @@
 	"url": "mongodb://localhost:27017/blocks_darkcoin"
       },
       "remoteBlockChain": {
-        "enabled": true,
+        "enabled": false,
         "url": "http://localhost:19000"
       }
     }
