@@ -112,9 +112,11 @@ function getTxTimelineForNetwork(req, res) {
   var since = req.query.since;
   var store = MongoStore.stores[netname];
   
+  var startTime = new Date();
   Query.getTxDetailsSinceID(store, since, function(err, arr) {
     if(err) throw err;
     var txlist = arr || [];
+    console.info('get timeline', req.params.netname, 'takes', (new Date() - startTime)/1000.0, 'secs');
     sendJSONP(req, res, txlist);
   });
 }
@@ -199,7 +201,6 @@ function sendTx(req, res, next) {
   }
   Query.addRawTx(req.params.netname, query.rawtx, info, function(err, ret) {
     if(err) {
-      console.error('hhhh', err);
       return next(err);
     }
     
@@ -268,7 +269,7 @@ function startServer(argv){
   }, function() {
     //Stream.createStream(server, netnames);
   });
-  server.listen(argv.p || 9000);
+  server.listen(argv.p || 9000, argv.h || '0.0.0.0');
 }
 
 module.exports.start = function(argv){

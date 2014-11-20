@@ -1,3 +1,4 @@
+var underscore = require('underscore');
 var express = require('express');
 var cluster = require('cluster');
 var NodeSet = require('../lib/NodeSet');
@@ -7,9 +8,9 @@ var chainserver = require('./chainserver');
 
 var nodeSet = new NodeSet();
 
-function startNode(netname) {
+function startNode(netname, argv) {
   nodeSet.run([netname], function(node) {
-    node.updateMempool = true;
+    node.updateMempool = false;
     node.allowOldBlock = false;
     node.synchronize = true;
   }, function(err) {
@@ -23,9 +24,17 @@ function startNode(netname) {
     }
     process.on('SIGINT', stopNode);
     process.on('SIGTERM', stopNode);
+
+    if(argv.r) {
+      var runsecs = parseInt(argv.r);
+      if(!isNaN(runsecs)) {
+	setTimeout(stopNode, runsecs * 1000);
+      }
+    }
   });
 }
 
+var workerList = [];
 module.exports.start = function(argv){
   var coins = argv.c;
   if(typeof coins == 'string') {
@@ -36,22 +45,42 @@ module.exports.start = function(argv){
   var startPort = parseInt(argv.p);
 
   if(cluster.isMaster) {
+    function forkWorker(env) {
+      var worker = cluster.fork(env);
+      workerList.push({env: env, worker: worker});
+    }
+
     coins.forEach(function(netname) {
       if(config.networks[netname].remoteBlockChain.enabled) {
-	cluster.fork({'PARG': netname,
-		      'REMOTE_CHAIN_URL': 'http://localhost:' + startPort});
-	cluster.fork({'PARG': 'p2p',
-		      'PORT': startPort});
+	forkWorker({'PARG': netname,
+	 'REMOTE_CHAIN_URL': 'http://localhost:' + startPort});
+	forkWorker({'PARG': 'p2p',
+		    'PORT': startPort});
 	startPort++;
       } else {
-	cluster.fork({'PARG': netname});
+	forkWorker({'PARG': netname});
       }
+    });
+
+    cluster.on('exit', function(worker, code, signal) {
+      for(var i=0; i<workerList.length; i++) {
+	var w = workerList[i];
+	if(w.worker.id == worker.id) {
+	  console.info('worker exit', w.env, code, signal);
+	  w.died = true;
+	  break;
+	}
+      }
+      var aliveWorkerList = underscore.reject(workerList, function(w) {
+	return w.died;
+      });
+      console.info('alives', aliveWorkerList.length);
     });
   } else {
     if(process.env.PARG == 'p2p') {
-      chainserver.start({p: process.env.PORT});
+      chainserver.start({p: process.env.PORT, r: argv.r});
     } else {
-      startNode(process.env.PARG);
+      startNode(process.env.PARG, argv);
     }
   }
 };

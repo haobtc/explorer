@@ -26,9 +26,12 @@ for(var i=0; i<5000; i++) {
   var hasBlock = false;
   blocks.forEach(function(block) {
     //print('block.hash', block.hash.hex(), block.isMain);
+    hasBlock = true;
     if(block.isMain) {
-      hasBlock = true;
       processBlock(block);
+    } else {
+      block.processed = true;
+      db.block.save(block);
     }
   });
   if(!hasBlock) break;

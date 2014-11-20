@@ -1,4 +1,5 @@
 build/
+config.local.json
 browser/bundle.js
 browser/vendor-bundle.js
 browser/testdata.js
