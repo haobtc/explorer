@@ -194,7 +194,9 @@ function sendTx(req, res, next) {
   }
   var info = {};
   if(query.remote_address) {
-    info.remote_address = query.remote_address;
+    info.remoteAddress = query.remote_address;
+  } else {
+    info.removeAddress = req.removeAddress;
   }
   if(query.note) {
     info.note = query.note;
@@ -215,6 +217,26 @@ function sendTx(req, res, next) {
 
 app.get('/queryapi/v1/sendtx/:netname', sendTx);
 app.post('/queryapi/v1/sendtx/:netname', sendTx);
+
+function decodeRawTx(req, res, next) {
+  var query = req.query;
+  if(req.method == 'POST') {
+    query = req.body;
+  }
+  var txObj = Query.decodeRawTx(req.params.netname, query.rawtx);
+  var store = MongoStore.stores[req.params.netname];
+  Query.txListToJSON(store, [txObj], function(err, txDetails) {
+    if(err) return next(err);
+    if(txDetails.length > 0) {
+      sendJSONP(req, res, txDetails[0]);
+    } else {
+      res.send({});
+    }
+  });
+};
+
+app.get('/queryapi/v1/decoderawtx/:netname', decodeRawTx);
+app.post('/queryapi/v1/decoderawtx/:netname', decodeRawTx);
 
 /*
 Stream.addRPC('sendtx', function(rpc, network, rawtx) {

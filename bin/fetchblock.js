@@ -1,5 +1,4 @@
 var express = require('express');
-var bodyParser = require('body-parser');
 var bitcore = require('bitcore-multicoin');
 var MongoStore = require('../lib/MongoStore');
 var helper = require('../lib/helper');
