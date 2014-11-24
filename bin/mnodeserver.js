@@ -10,7 +10,7 @@ var nodeSet = new NodeSet();
 
 function startNode(netname, argv) {
   nodeSet.run([netname], function(node) {
-    node.updateMempool = true;
+    node.updateMempool = false;
     node.allowOldBlock = false;
     node.synchronize = true;
   }, function(err) {
