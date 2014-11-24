@@ -66,8 +66,12 @@ module.exports.start = function(argv){
       for(var i=0; i<workerList.length; i++) {
 	var w = workerList[i];
 	if(w.worker.id == worker.id) {
-	  console.info('worker exit', w.env, code, signal);
-	  w.died = true;
+	  console.info('worker exit', w.env, code, signal, worker.suicide);
+	  //w.died = true;
+	  if(!worker.suicide) {
+	    console.info('suicide');
+	    w.worker = cluster.fork(w.env);
+	  }
 	  break;
 	}
       }
