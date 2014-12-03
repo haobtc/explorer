@@ -13,8 +13,19 @@ module.exports.start = function(argv){
   if(typeof coins == 'string') {
     coins = [coins];
   }
+  var endDate = null;
+  if(argv.r) {
+    var runsecs = parseInt(argv.r);
+    if(!isNaN(runsecs)) {
+      endDate = new Date().getTime() + runsecs * 1000;
+    }
+  }
+
+  console.info(endDate);
   nodeSet.run(coins||helper.netnames(), function(node) {
-    node.updateMempool = false;
+    node.endDate = endDate;
+    node.peerLimit = 250;
+    node.updateMempool = true;
     node.allowOldBlock = false;
     node.synchronize = true;
   }, function(err) {
@@ -28,11 +39,8 @@ module.exports.start = function(argv){
     }
     process.on('SIGINT', stopNode);
     process.on('SIGTERM', stopNode);
-    if(argv.r) {
-      var runsecs = parseInt(argv.r);
-      if(!isNaN(runsecs)) {
-	setTimeout(stopNode, runsecs * 1000);
-      }
+    if(endDate) {
+      setTimeout(stopNode, endDate - (new Date().getTime()));
     }
   });
 };
