@@ -22,7 +22,7 @@ function main() {
 	});
       },
       function(c) {
-	store.setSpent([tx], c);
+	//store.setSpent([tx], c);
       },
     ], function(err) {
       if(err) throw err;
