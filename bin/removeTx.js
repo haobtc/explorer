@@ -50,7 +50,7 @@ function main() {
 	  console.info('removed', tx);
 	  c();
 	});
-      }
+      },
     ], function(err) {
       if(err) throw err;
       process.exit();
