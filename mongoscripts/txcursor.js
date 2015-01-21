@@ -104,9 +104,10 @@ function cursorNext() {
   return true;
 }
 
+print(new Date(), 'txcount starts');
 for(var i=0; i<10000; i++) {
-  if(i % 1000 == 0){
+/*  if(i % 1000 == 0){
     print(i);
-  }
+  } */
   cursorNext();
 }
