@@ -25,7 +25,11 @@ module.exports.start = function(argv){
   nodeSet.run(coins||helper.netnames(), function(node) {
     node.endDate = endDate;
     node.peerLimit = 250;
-    node.updateMempool = true;
+    if(argv.denyMempool) {
+      node.updateMempool = false;
+    } else {
+      node.updateMempool = true;
+    }
     node.allowOldBlock = false;
     node.synchronize = true;
   }, function(err) {
