@@ -114,11 +114,18 @@ TxCursor.prototype.next = function() {
 //   this.db.runCommand('commitTransaction');
 // };
 
+var processed = 0;
 
 ['bitcoin', 'dogecoin', 'litecoin', 'darkcoin'].forEach(function(network) {
   var txCursor = new TxCursor('localhost:27017/blocks_' + network);
-  for(var i=0; i<1000; i++) {
+  for(var i=0; i<10000; i++) {
     var r = txCursor.next();
-    print('r', r);
+    if(!r) break;
+    processed++;
   }
 });
+
+if(processed > 0) {
+  sleep(1.0);
+}
+
