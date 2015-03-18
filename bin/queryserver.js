@@ -196,7 +196,7 @@ function sendTx(req, res, next) {
   if(query.remote_address) {
     info.remoteAddress = query.remote_address;
   } else {
-    info.removeAddress = req.removeAddress;
+    info.remoteAddress = req.remoteAddress;
   }
   if(query.note) {
     info.note = query.note;
@@ -207,10 +207,13 @@ function sendTx(req, res, next) {
     }
     
     if(ret != undefined) {
-      console.info('send', ret);
-      res.send(ret);
+      if(req.query.format == 'json') {
+	sendJSONP(req, res, {'txid': ret});
+      } else {
+	res.send(ret);
+      }
     } else {
-      res.status(400).send('Failed');
+      res.status(400).send({'error': 'Failed'});
     }
   });
 }
