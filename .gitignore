@@ -16,3 +16,4 @@ coverage
 docs
 config.json
 tmp
+logs

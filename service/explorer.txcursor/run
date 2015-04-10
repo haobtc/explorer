@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec /usr/local/bin/run-service haobtc 'mongo --quiet mongoscripts/txcursor.js'

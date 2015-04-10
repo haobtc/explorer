@@ -29,4 +29,15 @@ Start a query server
 % node start.js
 ```
 
+Install Services
+===========
+```
+cd <path/to/explorer>
+mkdir -p service/logs
+sudo ln -s $PWD/service/bin/run-service /usr/local/bin/run-service
+sudo ln -s $PWD/service/explorer.node /etc/service/explorer.node
+sudo ln -s $PWD/service/explorer.mnode /etc/service/explorer.mnode
+sudo ln -s $PWD/service/explorer.query /etc/service/explorer.query
+sudo ln -s $PWD/service/explorer.txcursor /etc/service/explorer.txcursor
 
+```

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec /usr/local/bin/run-service haobtc 'node start.js -r 300 -c bitcoin -s node'
