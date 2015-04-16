@@ -1,0 +1,6 @@
+#!/bin/sh
+
+sv=$1
+secs=$2
+#exec (svstat $sv | perl -ne 'if(/^([^\s:]+).*?(\d+) seconds/ && $2 > '$secs') {print "$1\n"; system "svc -k $1";}')
+exec svstat $sv | perl -ne 'if(/^([^\s:]+).*?(\d+) seconds/ && $2 > '$secs') {print "$1\n"; system "svc -k $1"}'

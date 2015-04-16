@@ -34,6 +34,7 @@ Install Services
 ```
 cd <path/to/explorer>
 mkdir -p service/logs
+sudo ln -s $PWD/service/bin/watch-service /usr/local/bin/watch-service
 sudo ln -s $PWD/service/bin/run-service /usr/local/bin/run-service
 sudo ln -s $PWD/service/explorer.node /etc/service/explorer.node
 sudo ln -s $PWD/service/explorer.mnode /etc/service/explorer.mnode
