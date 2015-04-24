@@ -1,7 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var bitcore = require('bitcore-multicoin');
-var MongoStore = require('../lib/MongoStore');
+//var MongoStore = require('../lib/MongoStore');
 var NodeSet = require('../lib/NodeSet');
 var helper = require('../lib/helper');
 var config = require('../lib/config');
@@ -30,8 +30,8 @@ module.exports.start = function(argv){
     } else {
       node.updateMempool = true;
     }
-    node.allowOldBlock = false;
-    node.synchronize = true;
+    node.updateMempool = false;
+    node.updateBlockChain = true;
   }, function(err) {
     if(err) throw err;
     function stopNode() {
