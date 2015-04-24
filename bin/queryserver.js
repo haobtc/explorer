@@ -8,9 +8,8 @@ var async = require('async');
 var app = express();
 var bodyParser = require('body-parser');
 var Query = require('../lib/Query');
-//var Stream = require('../lib/Stream');
-var MongoStore = require('../lib/MongoStore');
 var helper = require('../lib/helper');
+var blockstore = require('../lib/blockstore');
 
 app.use(bodyParser());
 
@@ -41,9 +40,8 @@ function getTxDetails(req, res) {
       var hashList = query[netname].split(',');
       if(hashList.length == 0) return c();
       hashList = hashList.map(function(hash) {return new Buffer(hash, 'hex');});
-      var store = MongoStore.stores[netname];
       var startTime = new Date();
-      Query.getTxDetails(store, hashList, function(err, txes) {
+      Query.getTxDetails(netname, hashList, function(err, txes) {
 	if(err) return c(err);
 	console.info('getTxDetails', netname, 'takes', (new Date() - startTime)/1000.0, 'secs');
 	results = results.concat(txes||[]);
@@ -51,10 +49,9 @@ function getTxDetails(req, res) {
       });
     };
   }
-  var tasks = [];
-  for(var netname in MongoStore.stores) {
-    tasks.push(getTx(netname));
-  }
+  var tasks = helper.netnames().map(function(netname) {
+    return getTx(netname);
+  });
 
   if(tasks.length > 0) {
     async.parallel(tasks, function(err) {
@@ -79,10 +76,11 @@ function getTxDetailsSinceID(req, res) {
   function txTask(netname) {
     return function(c) {
       var since = query.since;
-      var store = MongoStore.stores[netname];
-      Query.getTxDetailsSinceID(store, since, function(err, arr) {
+      if(since) {
+	since = new Buffer(since, 'hex');
+      }
+      Query.getTxListSinceId(netname, since, function(err, arr) {
 	if(err) throw err;
-	//sendJSONP(req, res, arr || []);
 	(arr||[]).forEach(function(tx) {
 	  txlist.push(tx);
 	});
@@ -91,10 +89,9 @@ function getTxDetailsSinceID(req, res) {
     };
   }
 
-  var tasks = [];
-  for(var netname in MongoStore.stores) {
-    tasks.push(txTask(netname));
-  }
+  var tasks = helper.netnames().map(function(netname) {
+    return txTask(netname);
+  });
   if(tasks.length > 0) {
     async.parallel(tasks, function(err) {
       if(err) throw err;
@@ -110,10 +107,8 @@ app.post('/queryapi/v1/tx/since', getTxDetailsSinceID);
 function getTxTimelineForNetwork(req, res) {
   var netname = req.params.netname;
   var since = req.query.since;
-  var store = MongoStore.stores[netname];
-  
   var startTime = new Date();
-  Query.getTxDetailsSinceID(store, since, function(err, arr) {
+  Query.getTxDetailsSinceID(netname, since, function(err, arr) {
     if(err) throw err;
     var txlist = arr || [];
     console.info('get timeline', req.params.netname, 'takes', (new Date() - startTime)/1000.0, 'secs');
@@ -158,7 +153,7 @@ app.get('/queryapi/v1/unspent', getUnspent);
 app.post('/queryapi/v1/unspent', getUnspent);
 
 // Get unspent
-function getTXList(req, res) {
+function getTxList(req, res) {
   var query = req.query;
   if(req.method == 'POST') {
     query = req.body;
@@ -178,14 +173,14 @@ function getTXList(req, res) {
     return sendJSONP(req, res, []);
   }
   var startTime = new Date();
-  Query.getTXList(addressList, {}, query.detail == 'yes', function(err, results) {
+  Query.getTxListOfAddresses(addressList, query.detail == 'yes', function(err, results) {
     if(err) throw err;
     console.info('getTXList takes', (new Date() - startTime)/1000.0, 'secs');
     sendJSONP(req, res, results);
   });
 }
-app.get('/queryapi/v1/tx/list', getTXList);
-app.post('/queryapi/v1/tx/list', getTXList);
+app.get('/queryapi/v1/tx/list', getTxList);
+app.post('/queryapi/v1/tx/list', getTxList);
 
 function sendTx(req, res, next) {
   var query = req.query;
@@ -226,49 +221,28 @@ function decodeRawTx(req, res, next) {
   if(req.method == 'POST') {
     query = req.body;
   }
-  var txObj = Query.decodeRawTx(req.params.netname, query.rawtx);
-  var store = MongoStore.stores[req.params.netname];
-  Query.txListToJSON(store, [txObj], function(err, txDetails) {
-    if(err) return next(err);
-    if(txDetails.length > 0) {
-      sendJSONP(req, res, txDetails[0]);
-    } else {
-      res.send({});
-    }
-  });
+  var tx = Query.decodeRawTx(req.params.netname, query.rawtx);
+  var tTx = new blockstore.ttypes.Tx();
+  tTx.netname(req.params.netname);
+  tTx.fromTxObj(tx);
+  sendJSONP(req, res, tTx.toJSON());
 };
 
 app.get('/queryapi/v1/decoderawtx/:netname', decodeRawTx);
 app.post('/queryapi/v1/decoderawtx/:netname', decodeRawTx);
 
-/*
-Stream.addRPC('sendtx', function(rpc, network, rawtx) {
-  Query.addRawTx(network, rawtx, function(err, txid) {
-    if(err) {
-      if(err instanceof helper.UserError) {
-	rpc.send({code: err.code, 'error': err.message});
-      } else {
-	rpc.send({'error': err.message});
-      }
-    } else {
-      rpc.send({'txid': txid});
-    }
-  });
-});
-*/
-
 app.get('/:netname/nodes.txt', function(req, res) {
-  var store = MongoStore.stores[req.params.netname];
-  store.getVar('peers.' + req.params.netname, function(err, v) {
+  var rpcClient = blockstore[req.params.netname];
+  rpcClient.getPeers(function(err, peers) {
     res.set('Content-Type', 'text/plain');
-    res.send(v.peers.join('\r\n'));
+    res.send(peers.join('\r\n'));
   });
 });
 
 app.get('/:netname/nodes.json', function(req, res) {
-  var store = MongoStore.stores[req.params.netname];
-  store.getVar('peers.' + req.params.netname, function(err, v) {
-    res.send(v.peers);
+  var rpcClient = blockstore[req.params.netname];
+  rpcClient.getPeers(function(err, peers) {
+    res.send(peers);
   });
 });
 
@@ -289,11 +263,6 @@ function startServer(argv){
   netnames = netnames || helper.netnames();
 
   var server = http.Server(app);
-  MongoStore.initialize(netnames, function(err, netname) {
-    if(err) throw err;
-  }, function() {
-    //Stream.createStream(server, netnames);
-  });
   server.listen(argv.p || 9000, argv.h || '0.0.0.0');
 }
 

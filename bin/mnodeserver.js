@@ -1,23 +1,23 @@
+var os = require('os');
 var underscore = require('underscore');
 var express = require('express');
 var cluster = require('cluster');
 var NodeSet = require('../lib/NodeSet');
 var helper = require('../lib/helper');
 var config = require('../lib/config');
-var chainserver = require('./chainserver');
 
 var nodeSet = new NodeSet();
 
 function startNode(netname, argv) {
-  nodeSet.run([netname], function(node) {
-    if(argv.denyMempool) {
-      node.updateMempool = false;
-    } else {
-      node.updateMempool = true;
+  var runsecs;
+  if(argv.r) {
+    runsecs = parseInt(argv.r);
+    if(!isNaN(runsecs)) {
+      nodeSet.stopTime = new Date().getTime() + runsecs * 1000;
     }
-
-    node.allowOldBlock = false;
-    node.synchronize = true;
+  }
+  nodeSet.run([netname], function(node) {
+    node.start(argv);
   }, function(err) {
     if(err) throw err;
     function stopNode() {
@@ -30,11 +30,8 @@ function startNode(netname, argv) {
     process.on('SIGINT', stopNode);
     process.on('SIGTERM', stopNode);
 
-    if(argv.r) {
-      var runsecs = parseInt(argv.r);
-      if(!isNaN(runsecs)) {
-	setTimeout(stopNode, runsecs * 1000);
-      }
+    if(!isNaN(runsecs)) {
+      setTimeout(stopNode, runsecs * 1000 + Math.random() * 2000);
     }
   });
 }
@@ -45,9 +42,23 @@ module.exports.start = function(argv){
   if(typeof coins == 'string') {
     coins = [coins];
   }
-  coins = coins || helper.netnames();
 
-  var startPort = parseInt(argv.p);
+  var tmp = [];
+  var coinNProcesses = {};
+  coins.forEach(function(netname) {
+    var idx = netname.indexOf(':');
+    var n = 1;
+    if(idx >= 0) {
+      n = parseInt(netname.substr(idx+1));
+      n = Math.max(Math.min(n, os.cpus().length), 1);
+      netname = netname.substr(0, idx);
+    }
+    coinNProcesses[netname] = n;
+    tmp.push(netname);
+  });
+  coins = tmp;
+
+  coins = coins || helper.netnames();
 
   if(cluster.isMaster) {
     function forkWorker(env) {
@@ -56,14 +67,9 @@ module.exports.start = function(argv){
     }
 
     coins.forEach(function(netname) {
-      if(config.networks[netname].remoteBlockChain.enabled) {
-	forkWorker({'PARG': netname,
-	 'REMOTE_CHAIN_URL': 'http://localhost:' + startPort});
-	forkWorker({'PARG': 'p2p',
-		    'PORT': startPort});
-	startPort++;
-      } else {
-	forkWorker({'PARG': netname});
+      var n = coinNProcesses[netname];
+      for(var i=0; i<n; i++) {
+	forkWorker({'NETNAME': netname});
       }
     });
 
@@ -72,24 +78,16 @@ module.exports.start = function(argv){
 	var w = workerList[i];
 	if(w.worker.id == worker.id) {
 	  console.info('worker exit', w.env, code, signal, worker.suicide);
-	  //w.died = true;
 	  if(!worker.suicide) {
-	    console.info('suicide');
 	    w.worker = cluster.fork(w.env);
 	  }
 	  break;
 	}
       }
-      var aliveWorkerList = underscore.reject(workerList, function(w) {
-	return w.died;
-      });
-      console.info('alives', aliveWorkerList.length);
     });
   } else {
-    if(process.env.PARG == 'p2p') {
-      chainserver.start({p: process.env.PORT, r: argv.r});
-    } else {
-      startNode(process.env.PARG, argv);
-    }
+    var netname = process.env.NETNAME;
+    startNode(netname, argv);
   }
 };
+

@@ -14,18 +14,6 @@ module.exports.start = function(argv){
   }, function(err) {
     if(err) throw err;
     var fetcher = new BlockFetcher(netname);
-    fetcher.run(function(){
-      fetcher.fetchBlock(blockHash, function(blockObj) {
-	console.info('got block w/', blockObj.txes.length, 'txes');
-	fetcher.blockChain.updateBlock(blockObj, function(err) {
-	  if(err) {
-	    console.info(err);
-	    throw err;
-	  }
-	  console.info('updated');
-	  process.exit();
-	});
-      });
-    });
+    fetcher.start(blockHash);
   });
 };

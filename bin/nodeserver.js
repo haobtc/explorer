@@ -1,7 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var bitcore = require('bitcore-multicoin');
-var MongoStore = require('../lib/MongoStore');
+//var MongoStore = require('../lib/MongoStore');
 var NodeSet = require('../lib/NodeSet');
 var helper = require('../lib/helper');
 var config = require('../lib/config');
@@ -13,25 +13,17 @@ module.exports.start = function(argv){
   if(typeof coins == 'string') {
     coins = [coins];
   }
-  var endDate = null;
+
   if(argv.r) {
     var runsecs = parseInt(argv.r);
     if(!isNaN(runsecs)) {
-      endDate = new Date().getTime() + runsecs * 1000;
+      nodeSet.stopTime = new Date().getTime() + runsecs * 1000;
     }
   }
-
-  console.info(endDate);
   nodeSet.run(coins||helper.netnames(), function(node) {
-    node.endDate = endDate;
-    node.peerLimit = 250;
-    if(argv.denyMempool) {
-      node.updateMempool = false;
-    } else {
-      node.updateMempool = true;
-    }
-    node.allowOldBlock = false;
-    node.synchronize = true;
+    node.peerman.peerLimit = 100;
+    node.start(argv);
+    stopTime = node.stopTime;
   }, function(err) {
     if(err) throw err;
     function stopNode() {
@@ -43,8 +35,8 @@ module.exports.start = function(argv){
     }
     process.on('SIGINT', stopNode);
     process.on('SIGTERM', stopNode);
-    if(endDate) {
-      setTimeout(stopNode, endDate - (new Date().getTime()));
+    if(!isNaN(runsecs)) {
+      setTimeout(stopNode, nodeSet.stopTime - (new Date().getTime()));
     }
   });
 };
