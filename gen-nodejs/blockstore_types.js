@@ -343,8 +343,8 @@ blockstore.Block.prototype.read = function(input) {
       }
       break;
       case 10:
-      if (ftype == Thrift.Type.I64) {
-        this.timestamp = input.readI64();
+      if (ftype == Thrift.Type.I32) {
+        this.timestamp = input.readI32();
       } else {
         input.skip(ftype);
       }
@@ -420,8 +420,8 @@ blockstore.Block.prototype.write = function(output) {
     output.writeFieldEnd();
   }
   if (this.timestamp !== null && this.timestamp !== undefined) {
-    output.writeFieldBegin('timestamp', Thrift.Type.I64, 10);
-    output.writeI64(this.timestamp);
+    output.writeFieldBegin('timestamp', Thrift.Type.I32, 10);
+    output.writeI32(this.timestamp);
     output.writeFieldEnd();
   }
   if (this.objId !== null && this.objId !== undefined) {
@@ -731,8 +731,8 @@ blockstore.Tx.prototype.read = function(input) {
       }
       break;
       case 5:
-      if (ftype == Thrift.Type.STRING) {
-        this.blockIndex = input.readBinary();
+      if (ftype == Thrift.Type.I32) {
+        this.blockIndex = input.readI32();
       } else {
         input.skip(ftype);
       }
@@ -818,8 +818,8 @@ blockstore.Tx.prototype.write = function(output) {
     output.writeFieldEnd();
   }
   if (this.blockIndex !== null && this.blockIndex !== undefined) {
-    output.writeFieldBegin('blockIndex', Thrift.Type.STRING, 5);
-    output.writeBinary(this.blockIndex);
+    output.writeFieldBegin('blockIndex', Thrift.Type.I32, 5);
+    output.writeI32(this.blockIndex);
     output.writeFieldEnd();
   }
   if (this.objId !== null && this.objId !== undefined) {
@@ -1015,8 +1015,8 @@ blockstore.UTXO.prototype.read = function(input) {
       }
       break;
       case 7:
-      if (ftype == Thrift.Type.I64) {
-        this.timestamp = input.readI64();
+      if (ftype == Thrift.Type.I32) {
+        this.timestamp = input.readI32();
       } else {
         input.skip(ftype);
       }
@@ -1063,8 +1063,8 @@ blockstore.UTXO.prototype.write = function(output) {
     output.writeFieldEnd();
   }
   if (this.timestamp !== null && this.timestamp !== undefined) {
-    output.writeFieldBegin('timestamp', Thrift.Type.I64, 7);
-    output.writeI64(this.timestamp);
+    output.writeFieldBegin('timestamp', Thrift.Type.I32, 7);
+    output.writeI32(this.timestamp);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
