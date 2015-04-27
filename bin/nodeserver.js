@@ -21,7 +21,6 @@ module.exports.start = function(argv){
     }
   }
 
-  console.info(endDate);
   nodeSet.run(coins||helper.netnames(), function(node) {
     node.endDate = endDate;
     node.peerLimit = 250;
